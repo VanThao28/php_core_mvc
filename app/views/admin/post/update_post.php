@@ -59,7 +59,7 @@
                                     <div class="col-md-9">
                                         <input type="file" accept="image/*" name="input_image" onchange="loadFile(event)">
                                         <img id="output" width="250px" height="250px" src="<?php echo _WEB_ROOT; ?>/<?php echo $editPostIds['image_post'] ?>" /></br>
-                                        <?php echo (!empty($dataFieldPostUpdate['msgCreatePostImage'])) ? '<span style="color:red;">' . $dataFieldPostUpdate['msgCreatePostImage'] . '</span><br>' : false ?>
+                                        <?php echo (!empty($dataFieldPostUpdate['msgUpdatePostImage'])) ? '<span style="color:red;">' . $dataFieldPostUpdate['msgUpdatePostImage'] . '</span><br>' : false ?>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -67,7 +67,6 @@
                                     <div class="col-md-9">
                                         <input type="text" class="form-control" name="input_category" placeholder="Category" value="<?php echo $editPostIds['tbl_category'] ?>">
                                         <?php echo (!empty($dataFieldPostUpdate['errorUpdatePost']) && array_key_exists('input_category', $dataFieldPostUpdate['errorUpdatePost'])) ? '<span style="color:red;">' . $dataFieldPostUpdate['errorUpdatePost']['input_category'] . '</span><br>' : false ?>
-
                                     </div>
                                 </div>
                                 <div class="form-group row">

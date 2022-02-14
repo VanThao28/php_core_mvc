@@ -51,6 +51,7 @@
                                 <div class="col-md-9">
                                     <input type="file" accept="image/*" name="form_input_image" onchange="loadFile(event)">
                                     <img id="output" width="250px" height="250px" /></br>
+                                    <?php echo (!empty($dataFieldsPost['msgCreatePostImageError'])) ? '<span style="color:red;">' . $dataFieldsPost['msgCreatePostImageError'] . '</span><br>' : false ?>
                                     <?php echo (!empty($dataFieldsPost['msgCreatePostImage'])) ? '<span style="color:red;">' . $dataFieldsPost['msgCreatePostImage'] . '</span><br>' : false ?>
                                 </div>
                             </div>

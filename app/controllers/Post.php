@@ -27,8 +27,8 @@ class Post extends Controller
     {
         $checkSession = Session::data('checkLogin');
         if (!empty($checkSession)) {
-            $request = new Request();
 
+            $this->data['msgCreatePostImageError'] = Session::flash('msgCreatePostImageError');
             $this->data['errorsCreatePost'] = Session::flash('errorsCreatePost');
             $this->data['msgCreatePost'] = Session::flash('msgCreatePost');
             $this->data['oldCreatePost'] = Session::flash('oldCreatePost');
@@ -58,13 +58,6 @@ class Post extends Controller
         $unique_image = substr(md5(time()), 0, 10) . '.' . $file_ext;
         $uploaded_image = 'public/assets/image_blog/' . $unique_image;
 
-        if (!empty($file_name)) {
-            if (in_array($file_ext, $permited) === false) {
-                Session::flash('msgCreatePostImage', 'lỗi,bạn chỉ có thể tải lên.' . implode(',', $permited));
-            }
-            move_uploaded_file($file_temp, $uploaded_image);
-        }
-
         if ($request->isPost()) {
             $request->rules([
                 'form_input_title' => 'required',
@@ -82,21 +75,30 @@ class Post extends Controller
                 Session::flash('errorsCreatePost', $request->errors());
                 Session::flash('msgCreatePost', 'đã có lỗi, vui lòng kiểm tra lại');
                 Session::flash('oldCreatePost', $request->getFields());
-            } else {
-                $data = $request->getFields();
+            }
+            if (!empty($file_name)) {
+                if (in_array($file_ext, $permited) === false) {
+                    Session::flash('msgCreatePostImage', 'lỗi,bạn chỉ có thể tải lên.' . implode(',', $permited));
+                    Session::flash('msgCreatePost', 'đã có lỗi vui lòng kiểm tra lại');
+                } else {
+                    move_uploaded_file($file_temp, $uploaded_image);
+                    $data = $request->getFields();
 
-                $data = [
-                    'btl_user_id' => $data['form_input_user'],
-                    'tbl_title' => $data['form_input_title'],
-                    'tbl_connent' => $data['form_input_connent'],
-                    'image_post' => $uploaded_image,
-                    'tbl_category' => $data['form_input_category'],
-                    'is_public' => $data['form_input_is_public'],
-                    'tbl_date' => date('Y-m-d'),
-                ];
+                    $data = [
+                        'btl_user_id' => $data['form_input_user'],
+                        'tbl_title' => $data['form_input_title'],
+                        'tbl_connent' => $data['form_input_connent'],
+                        'image_post' => $uploaded_image,
+                        'tbl_category' => $data['form_input_category'],
+                        'is_public' => $data['form_input_is_public'],
+                        'tbl_date' => date('Y-m-d'),
+                    ];
 
-                $this->post->createPostModel($data);
-                Session::flash('msgCreatePosts', 'thêm thành công');
+                    $this->post->createPostModel($data);
+                    Session::flash('msgCreatePosts', 'thêm thành công');
+                }
+            }else{
+                Session::flash('msgCreatePostImageError','image không được bỏ trống');
             }
             $response = new Response();
             $response->redirect('post/createPost');
@@ -137,13 +139,6 @@ class Post extends Controller
         $unique_image = substr(md5(time()), 0, 10) . '.' . $file_ext;
         $uploaded_image = 'public/assets/image_blog/' . $unique_image;
 
-        if (!empty($file_name)) {
-            if (in_array($file_ext, $permited) === false) {
-                Session::flash('msgUpdatePostImage', 'lỗi,bạn chỉ có thể tải lên.' . implode(',', $permited));
-            }
-            move_uploaded_file($file_temp, $uploaded_image);
-        }
-
         if ($request->isPost()) {
             $request->rules([
                 'input_title' => 'required',
@@ -161,20 +156,28 @@ class Post extends Controller
                 Session::flash('errorUpdatePost', $request->errors());
                 Session::flash('msgUpdatePost', 'đã có lỗi vui lòng kiểm tra lại');
                 Session::flash('oldUpdatePost', $request->getFields());
-            } else {
+            }
                 $data = $request->getFields();
-                if ($file_name) {
-                    $data = [
-                        'btl_user_id' => $data['input_user'],
-                        'tbl_title' => $data['input_title'],
-                        'tbl_connent' => $data['input_connent'],
-                        'image_post' => $uploaded_image,
-                        'tbl_category' => $data['input_category'],
-                        'is_public' => $data['input_is_public'],
-                        'tbl_date' => date('Y-m-d'),
-                    ];
-                    $this->post->updateUserModel($data, $idPost);
-                    Session::flash('msgUpdateDataPost', 'sửa thành công');
+                if (!empty($file_name)) {
+                    if (!empty($file_name)) {
+                        if (in_array($file_ext, $permited) === false) {
+                            Session::flash('msgUpdatePostImage', 'lỗi,bạn chỉ có thể tải lên.' . implode(',', $permited));
+                            Session::flash('msgUpdatePost', 'đã có lỗi vui lòng kiểm tra lại');
+                        } else {
+                            move_uploaded_file($file_temp, $uploaded_image);
+                            $data = [
+                                'btl_user_id' => $data['input_user'],
+                                'tbl_title' => $data['input_title'],
+                                'tbl_connent' => $data['input_connent'],
+                                'image_post' => $uploaded_image,
+                                'tbl_category' => $data['input_category'],
+                                'is_public' => $data['input_is_public'],
+                                'tbl_date' => date('Y-m-d'),
+                            ];
+                            $this->post->updateUserModel($data, $idPost);
+                            Session::flash('msgUpdateDataPost', 'sửa thành công');
+                        }
+                    }
                 } else {
                     $data = [
                         'btl_user_id' => $data['input_user'],
@@ -187,7 +190,6 @@ class Post extends Controller
                     $this->post->updateUserModel($data, $idPost);
                     Session::flash('msgUpdateDataPost', 'sửa thành công');
                 }
-            }
             $response = new Response();
             $response->redirect('post/editPost/' . $idPost);
         }
